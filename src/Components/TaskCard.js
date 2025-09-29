@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 
 function TaskCard({
+  newCardStatus,
   viewStatus,
   editStatus,
   setViewStatus,
   setEditStatus,
+  setNewCardStatus,
   setSubmittedData,
   cardData,
   setCardData,
-  handleEditBtn,
+  handleEditBtn
 }) {
   const emptyForm = {
     id: '',
@@ -56,6 +58,7 @@ function TaskCard({
 
   const handleCloseBtn = () => {
     handleCancel();
+    setNewCardStatus(false);
     setEditStatus(false);
     setViewStatus(false);
     return;

@@ -30,13 +30,14 @@ function Dashboard() {
   }, [submitted]);
 
   // States inside card view
+  const [newCardStatus, setNewCardStatus] = useState(false);
   const [viewStaus, setViewStatus] = useState(false);
   const [cardData, setCardData] = useState(null);
   const [editStatus, setEditStatus] = useState(false);
 
   // Handler to set viewStatus
   const handleAddTaskBtn = () => {
-    setViewStatus(true);
+    setNewCardStatus(true);
   };
 
   // Handler for editButton
@@ -85,12 +86,14 @@ function Dashboard() {
         </div>
         <div className="button-area">
           <button onClick={handleAddTaskBtn}>Add Task</button>
-          {(viewStaus || editStatus) && (
+          {(newCardStatus || viewStaus || editStatus) && (
             <TaskCard
+              newCardStatus={newCardStatus}
               viewStatus={viewStaus}
               editStatus={editStatus}
               setViewStatus={setViewStatus}
               setEditStatus={setEditStatus}
+              setNewCardStatus={setNewCardStatus}
               setSubmittedData={setSubmittedData}
               cardData={cardData}
               setCardData={setCardData}
