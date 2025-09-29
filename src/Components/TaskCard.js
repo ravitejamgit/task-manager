@@ -10,7 +10,8 @@ function TaskCard({
   setSubmittedData,
   cardData,
   setCardData,
-  handleEditBtn
+  handleEditBtn,
+  handleDeleteBtn
 }) {
   const emptyForm = {
     id: '',
@@ -83,6 +84,7 @@ function TaskCard({
         </div>
         <div className="card-footer">
           <button onClick={() => handleEditBtn(formData.id)}>Edit</button>
+          <button onClick={() => {handleCloseBtn(); handleDeleteBtn(formData.id)}}>Delete</button>
         </div>
       </div>
     );

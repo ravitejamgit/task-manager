@@ -60,6 +60,7 @@ function Dashboard() {
 
   const handleDeleteBtn = (id) => {
     setDeleteData(data.find((each) => each.id === id));
+    setViewStatus(false);
   };
 
   return (
@@ -107,6 +108,7 @@ function Dashboard() {
               cardData={cardData}
               setCardData={setCardData}
               handleEditBtn={handleEditBtn}
+              handleDeleteBtn={handleDeleteBtn}
             />
           )}
         </div>
