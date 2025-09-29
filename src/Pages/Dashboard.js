@@ -14,9 +14,9 @@ import TaskCard from '../Components/TaskCard';
 function Dashboard() {
   // Initital data fetching
 
+
   // Loading Tasks data from local storage.
   const [data, setData] = useState(() => getTasks());
-  const [redundantData, setRedundantData] = useState(data);
   const [submitted, setSubmittedData] = useState(null);
   const [deleteData, setDeleteData] = useState(null);
 
@@ -26,9 +26,10 @@ function Dashboard() {
   const [cardData, setCardData] = useState(null);
   const [editStatus, setEditStatus] = useState(false);
 
-  // Task List filter states
+  // Task List filter states & sorting 
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
+  const [sortBy, setSortBy] = useState('');
 
   // Handler to set viewStatus
   const handleAddTaskBtn = () => {
@@ -55,16 +56,31 @@ function Dashboard() {
 
   // Filter handler
   const filteredData = useMemo(() => {  
-    return data.filter((each) => ((statusFilter === '' || each.status === statusFilter) && (priorityFilter === '' || each.priority === priorityFilter)));
-  }, [data, statusFilter, priorityFilter]);
+    let resultData = data.filter((each) => ((statusFilter === '' || each.status === statusFilter) && (priorityFilter === '' || each.priority === priorityFilter)));
+
+    if(sortBy === 'dueDate') {
+      resultData = [...resultData].sort((t1, t2) => new Date(t1.dueDate) - new Date(t2.dueDate));
+    }
+    else if(sortBy === 'createdAt') {
+      resultData = [...resultData].sort((t1, t2) => new Date(t2.createdAt) - new Date(t1.createdAt));
+    }
+    else if(sortBy === 'priority') {
+      const priorityValue = {High : 3, Medium : 2, Low : 1};
+      resultData = [...resultData].sort((t1, t2) => priorityValue[t2.priority] - priorityValue[t1.priority]);
+    }
+
+    return resultData;
+
+  }, [data, statusFilter, priorityFilter, sortBy]);
 
   const clearFilterBtn = () => {
     setPriorityFilter(''); 
     setStatusFilter('');
+    setSortBy('');
     setViewStatus(false);
   }
 
-  // UseEffect
+  // UseEffect for backend storage CRUD Operations
   useEffect(() => {
     if (submitted) {
       if (data.find((entry) => entry.id === submitted.id)) {
@@ -74,13 +90,11 @@ function Dashboard() {
       }
       setSubmittedData(null);
       setData(getTasks());
-      setRedundantData(data);
     }
     if(deleteData) {
       deleteTask(deleteData);
       setDeleteData(null);
       setData(getTasks());
-      setRedundantData(data);
     }
 
   }, [submitted, deleteData]);
@@ -108,6 +122,13 @@ function Dashboard() {
           <option value="Low">Low</option>
           <option value="Medium">Medium</option>
           <option value="High">High</option>
+        </select>
+        <label>Sort : </label>
+        <select name="sortBy" value={sortBy} onChange={(event) => {setSortBy(event.target.value)}}>
+          <option value="">All</option>
+          <option value="dueDate">Due Date</option>
+          <option value="createdAt">Created At</option>
+          <option value="priority">Priority</option>
         </select>
         <button onClick={clearFilterBtn}>Clear Filter</button>
       </div>
