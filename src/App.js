@@ -3,6 +3,10 @@ import Login from './Pages/Login';
 import Profile from "./Pages/Profile";
 import Dashboard from "./Pages/Dashboard";
 import './App.css';
+import { addTasks, updateTask, deleteTask } from "./utils/localStorageHelpers";
+import TaskForm from "./Pages/TaskForm";
+
+
 
 function App() {
   return (
@@ -12,6 +16,7 @@ function App() {
           <Route path = "/login" element = { <Login />} />
           <Route path = "/profile" element = { <Profile />} />
           <Route path = "/dashboard" element = { <Dashboard />} />
+
         </Routes>
       </Router>
     </div>
