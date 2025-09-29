@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getTasks, addTasks, updateTask } from '../utils/localStorageHelpers';
+import { getTasks, addTasks, updateTask, deleteTask } from '../utils/localStorageHelpers';
 import TaskCard from '../Components/TaskCard';
 
 // Task Properties
@@ -16,6 +16,7 @@ function Dashboard() {
   // Loading Tasks data from local storage.
   const [data, setData] = useState(() => getTasks());
   const [submitted, setSubmittedData] = useState(null);
+  const [deleteData, setDeleteData] = useState(null);
 
   useEffect(() => {
     if (submitted) {
@@ -24,10 +25,14 @@ function Dashboard() {
       } else {
         addTasks(submitted);
       }
-      setData(getTasks());
       setSubmittedData(null);
     }
-  }, [submitted]);
+    else if(deleteData) {
+      deleteTask(deleteData);
+      setDeleteData(null);
+    }
+    setData(getTasks());
+  }, [submitted, deleteData]);
 
   // States inside card view
   const [newCardStatus, setNewCardStatus] = useState(false);
@@ -53,6 +58,10 @@ function Dashboard() {
     setViewStatus(true);
   };
 
+  const handleDeleteBtn = (id) => {
+    setDeleteData(data.find((each) => each.id === id));
+  };
+
   return (
     <div>
       <div className="dashboard-header">
@@ -76,7 +85,7 @@ function Dashboard() {
                       <button onClick={() => handleEditBtn(each.id)}>
                         Edit
                       </button>
-                      <button>Delete</button>
+                      <button onClick={() => handleDeleteBtn(each.id)}>Delete</button>
                     </div>
                   </span>
                 </li>
