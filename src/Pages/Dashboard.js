@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getTasks, addTasks, updateTask, deleteTask } from '../utils/localStorageHelpers';
 import TaskCard from '../Components/TaskCard';
 
@@ -13,32 +13,22 @@ import TaskCard from '../Components/TaskCard';
 
 function Dashboard() {
   // Initital data fetching
+
   // Loading Tasks data from local storage.
   const [data, setData] = useState(() => getTasks());
+  const [redundantData, setRedundantData] = useState(data);
   const [submitted, setSubmittedData] = useState(null);
   const [deleteData, setDeleteData] = useState(null);
-
-  useEffect(() => {
-    if (submitted) {
-      if (data.find((entry) => entry.id === submitted.id)) {
-        updateTask(submitted);
-      } else {
-        addTasks(submitted);
-      }
-      setSubmittedData(null);
-    }
-    else if(deleteData) {
-      deleteTask(deleteData);
-      setDeleteData(null);
-    }
-    setData(getTasks());
-  }, [submitted, deleteData]);
 
   // States inside card view
   const [newCardStatus, setNewCardStatus] = useState(false);
   const [viewStaus, setViewStatus] = useState(false);
   const [cardData, setCardData] = useState(null);
   const [editStatus, setEditStatus] = useState(false);
+
+  // Task List filter states
+  const [statusFilter, setStatusFilter] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState('');
 
   // Handler to set viewStatus
   const handleAddTaskBtn = () => {
@@ -63,22 +53,74 @@ function Dashboard() {
     setViewStatus(false);
   };
 
+  // Filter handler
+  const filteredData = useMemo(() => {  
+    return data.filter((each) => ((statusFilter === '' || each.status === statusFilter) && (priorityFilter === '' || each.priority === priorityFilter)));
+  }, [data, statusFilter, priorityFilter]);
+
+  const clearFilterBtn = () => {
+    setPriorityFilter(''); 
+    setStatusFilter('');
+    setViewStatus(false);
+  }
+
+  // UseEffect
+  useEffect(() => {
+    if (submitted) {
+      if (data.find((entry) => entry.id === submitted.id)) {
+        updateTask(submitted);
+      } else {
+        addTasks(submitted);
+      }
+      setSubmittedData(null);
+      setData(getTasks());
+      setRedundantData(data);
+    }
+    if(deleteData) {
+      deleteTask(deleteData);
+      setDeleteData(null);
+      setData(getTasks());
+      setRedundantData(data);
+    }
+
+  }, [submitted, deleteData]);
+
+  
+
   return (
     <div>
       <div className="dashboard-header">
         <h2>Dashboard</h2>
       </div>
+      <h4>Task List</h4>
+      <div className="filters">
+        <label>Status : </label>
+        <select name="filterByStatus" value={statusFilter} onChange={(event) => {setStatusFilter(event.target.value)}}>
+          <option value="">All</option>
+          <option value="To-Do">To-Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        
+        <label>Priority : </label>
+        <select name="filterByPriority" value={priorityFilter} onChange={(event) => {setPriorityFilter(event.target.value)}}>
+          <option value="">All</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <button onClick={clearFilterBtn}>Clear Filter</button>
+      </div>
       <div className="dashboard-body">
         <div className="task-list">
-          <h3>Task List</h3>
           <ul>
-            {data.length === 0 ? (
+            {filteredData.length === 0 ? (
               <div>No Saved Data....</div>
             ) : (
-              data.map((each) => (
+              filteredData.map((each) => (
                 <li key={each.id}>
                   <span>
-                    {each.id} - {each.title} - {each.status}
+                    {} - {each.title} - {each.status} - {each.priority} - {each.dueDate}
                     <div className="task-actionBtns">
                       <button onClick={() => handleViewBtn(each.id)}>
                         View
